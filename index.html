@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time City Weather Information | Weather App</title>
+    <meta name="description" content="Stay informed with real-time weather updates for cities around the world. Plan your activities and travel with">
+    <link rel="icon" href="icon.webp" type="image/x-icon">
+   <style>
+
+    body {
+        font-family: 'Time New Roman', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-image: url("https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_640.jpg");
+    }
+    
+    .container {
+        background-image: url(icon.webp);
+        padding: 20px;
+        border: 5px solid black;
+        border-radius: 10px;
+        width: 400px;
+        text-align: center;
+    }
+    
+    .title {
+        font-size: 40px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    
+    .city-input {
+        border-radius: 1px solid black;
+        width: 90%;
+        padding: 10px;
+        margin-bottom: 20px;
+        background-color: rgba(35, 126, 246, 0.353);
+        color: black;
+        font-size: larger;
+        font-weight: bolder;
+    }
+
+    .city-input:focus {
+        border-radius: 5px solid black;
+        width: 90%;
+        padding: 10px;
+        margin-bottom: 20px;
+        background-color: rgb(35, 126, 246);
+    }
+    
+    .weather-info {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    
+    .info {
+        margin-bottom: 10px;
+        
+    }
+    
+    .label {
+        font-weight: bold;
+    }
+    .span{
+        float: right;
+    }
+
+    .city-input::placeholder { 
+        color: rgb(255, 255, 255);
+        opacity: 78%;
+      }
+      
+
+    .value {
+        font-weight: bold;
+        color: black;
+        text-align: right ;
+
+    }
+    
+    .submit-button {
+        background-color:rgba(17, 0, 255, 0.359);
+        color: rgb(0, 0, 0);
+        border: none;
+        padding: 10px 20px;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        width: 100%;
+    }
+    .submit-button:hover {
+        background-color: rgb(17, 0, 255);
+        color: rgb(0, 0, 0);
+        border: none;
+        padding: 10px 20px;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        width: 100%;
+    }
+    .submit-button:focus{
+        background-color: rgb(38, 255, 0);
+        color: rgb(255, 255, 255);
+        border: none;
+        padding: 10px 20px;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .back-video{
+        position:absolute ;
+        right: 0;
+        bottom: 0;
+        z-index: -2;
+        filter: blur(3px);
+    }
+    @media(min-aspect-ratio:16/9){
+        .back-video{
+            width: 100%;
+            height: auto;
+        }
+    }
+    @media(max-aspect-ratio:16/9){
+        .back-video{
+            width: auto;
+            height: 100%;
+        }
+    }
+   </style>
+</head>
+<body>
+    <video autoplay loop muted plays-inline class="back-video">
+        <source src="videoplayback.mp4" type="video/mp4">
+    </video>
+    <div class="container">
+        <h1 class="title"> Real-Time Weather </h1>
+        <input  type= "text" id="cityInput" class="city-input" placeholder="Enter City Name" >
+        
+        <div class="weather-info">
+            <div class="info">
+                <span class="label">Climate</span>
+                <div class="span">
+                <span id="weatherClimate" class="value"></span>
+                </div>
+            </div>
+            <div class="info">
+                <span class="label">Description</span>
+                <div class="span">
+                <span id="weatherDescription" class="value"></span>
+                </div>
+            </div>
+            <div class="info">
+                <span class="label">Temperature</span>
+                <div class="span"> 
+                    <span id="temperature" class="value"></span>
+                <span> ℃</span>
+                </div>
+                
+            </div>
+            <div class="info">
+                <span class="label">Pressure</span>
+                <div class="span">                               
+                <span id="pressure" class="value"></span>
+                <span>hPa</span>
+                </div>
+            </div>
+        </div>
+        
+        <button id="submitButton" class="submit-button"> 🔍 search</button>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const cityInput = document.getElementById("cityInput");
+            const weatherClimate = document.getElementById("weatherClimate");
+            const weatherDescription = document.getElementById("weatherDescription");
+            const temperature = document.getElementById("temperature");
+            const pressure = document.getElementById("pressure");
+            const submitButton = document.getElementById("submitButton");
+
+            submitButton.addEventListener("click", function() {
+                const city = cityInput.value.trim();
+                if (city === "") {
+                    alert("Please enter a city name.");
+                    return;
+                }else if (/\d/.test(city)) {
+                    alert("Please enter a correct city name. Numbers are not allowed.");
+                    return;
+                 }
+                
+                const apiKey = "3582913f081af70564f5d6932d35d496"; // Replace with your OpenWeatherMap API key
+                const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.cod === "404") {
+                            alert("City not found. Please enter a valid city name.");
+                        } else {
+                                weatherClimate.textContent = data.weather[0].main;
+                                weatherDescription.textContent = data.weather[0].description;
+                                temperature.textContent = Math.round(data.main.temp - 273.15);
+                                pressure.textContent = data.main.pressure;
+                        }
+                    })
+                    .catch(error =>alert(error));
+            });
+        });
+    </script>
+</body>
+</html>
